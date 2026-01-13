@@ -70,18 +70,53 @@ const app = {
         input.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file && this.currentPhotoMember) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    this.data.photos[this.currentPhotoMember] = event.target.result;
+                // Compress/Resize before saving
+                this.resizeImage(file, 300, 300, (resizedBase64) => {
+                    this.data.photos[this.currentPhotoMember] = resizedBase64;
                     // Reset position when new photo uploaded
                     this.data.photoPositions[this.currentPhotoMember] = { x: 50, y: 50 };
                     this.saveData();
                     this.updateUI();
-                };
-                reader.readAsDataURL(file);
+                });
             }
             input.value = ''; // Reset
         });
+    },
+
+    resizeImage: function (file, maxWidth, maxHeight, callback) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Calculate new dimensions
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Get compressed base64 (JPEG 0.7 quality)
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                callback(dataUrl);
+            };
+        };
     },
 
     initModalListeners: function () {
