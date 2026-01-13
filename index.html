@@ -1,1 +1,119 @@
-hi
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabungan Gen4-nomenal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Tabungan Gen4-nomenal</h1>
+            <p>Nabung hari ini untuk bekal semester akhir</p>
+        </header>
+
+        <!-- Total Savings Section -->
+        <div class="total-savings-card">
+            <h2>Total Tabungan Bersama</h2>
+            <div class="total-amount" id="global-total">Rp 0</div>
+        </div>
+
+        <!-- Hidden File Input for Photos -->
+        <input type="file" id="photo-input" accept="image/*" style="display: none;">
+
+        <!-- Members Cards -->
+        <div class="members-grid" id="members-container">
+            <!-- Member cards will be injected here by JS -->
+        </div>
+
+        <!-- Transaction Form -->
+        <div class="transaction-section">
+            <div class="card form-card">
+                <h3>Transaksi Baru</h3>
+                <form id="transaction-form">
+                    <div class="form-group">
+                        <label for="member-select">Pilih Anggota</label>
+                        <select id="member-select" required>
+                            <option value="" disabled selected>-- Pilih Siapa --</option>
+                            <!-- Options injected by JS -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount-input">Jumlah (Rp)</label>
+                        <input type="number" id="amount-input" min="1" placeholder="Contoh: 10.000" required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-save" onclick="app.handleTransaction('deposit')">
+                            📥 Nabung
+                        </button>
+                        <button type="button" class="btn btn-withdraw" onclick="app.handleTransaction('withdraw')">
+                            📤 Ambil
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="history-section">
+            <h3>Riwayat Transaksi</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nama</th>
+                            <th>Jenis</th>
+                            <th>Jumlah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <!-- History rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="empty-history-msg" class="empty-state" style="display: none;">
+                Belum ada transaksi.
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Position Modal -->
+    <div id="position-modal" class="modal">
+        <div class="modal-content">
+            <h3>Atur Posisi Foto</h3>
+            <div class="preview-container">
+                <img id="preview-img" src="" alt="Preview">
+            </div>
+
+            <div class="control-group">
+                <label>Posisi Horizontal (X)</label>
+                <input type="range" id="pos-x" min="0" max="100" value="50">
+            </div>
+
+            <div class="control-group">
+                <label>Posisi Vertikal (Y)</label>
+                <input type="range" id="pos-y" min="0" max="100" value="50">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="app.closePositionModal()">Batal</button>
+                <button class="btn btn-save" onclick="app.savePosition()">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
