@@ -40,7 +40,16 @@ const app = {
     },
 
     saveData: function () {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                alert('Memori Browser Penuh! Tidak bisa menyimpan foto baru. Coba hapus beberapa data atau gunakan foto yang lebih kecil.');
+            } else {
+                alert('Gagal menyimpan data: ' + e.message);
+            }
+            console.error(e);
+        }
     },
 
     formatCurrency: function (amount) {
@@ -70,13 +79,16 @@ const app = {
         input.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file && this.currentPhotoMember) {
+                // Show loading indicator (optional, but good for UX)
                 // Compress/Resize before saving
-                this.resizeImage(file, 300, 300, (resizedBase64) => {
+                // Optimization: Resize to 200x200 (enough for avatar) and 0.6 quality
+                this.resizeImage(file, 200, 200, (resizedBase64) => {
                     this.data.photos[this.currentPhotoMember] = resizedBase64;
                     // Reset position when new photo uploaded
                     this.data.photoPositions[this.currentPhotoMember] = { x: 50, y: 50 };
                     this.saveData();
                     this.updateUI();
+                    alert('Foto berhasil diupdate!');
                 });
             }
             input.value = ''; // Reset
@@ -112,10 +124,16 @@ const app = {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Get compressed base64 (JPEG 0.7 quality)
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                // Get compressed base64 (JPEG 0.6 quality)
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
                 callback(dataUrl);
             };
+            img.onerror = () => {
+                alert('Gagal memproses gambar. File mungkin rusak.');
+            };
+        };
+        reader.onerror = () => {
+            alert('Gagal membaca file.');
         };
     },
 
